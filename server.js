@@ -53,7 +53,7 @@ function Location(cityInput,rawLocationData) {
 }
 
 function Weather(day){
-  this.forcast = day.weather.description;
+  this.forecast = day.weather.description;
   this.time = day.valid_date;
 }
 
