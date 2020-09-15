@@ -36,11 +36,11 @@ Currently using:
 
 ## work log
 
-Number and name of feature:
+Number and name of feature: 1 Locations
 
-Estimate of time needed to complete:
+Estimate of time needed to complete: 45 min
 
-Start time:
+Start time:6.30p
 
 Finish time:
 
