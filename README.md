@@ -30,30 +30,39 @@ Currently using:
 
 ## Change Log
 
-<!-- All times in -8gmt -->
+<!-- All times in PST-->
 
-09-14-2020 17:00 - Application now has a fully-functional express server, with heroku deployment and proof of life route.
+09-14-2020 5:00pm PST  - Application now has a fully-functional express server, with heroku deployment and proof of life route.
+09-14-2020 8:00pm PST  - App can now pull data on locations from internal file
+09-14-2020 9:45pm PST  - App can now pull data on weather from internal file and parse it to usable needs
+09-15-2020 11:15am PST  - App Now has catch errors for 404 and 500 codes
+09-15-2020 3:45pm PST  - App can now pull data on weather from internal file via map method.
 
 ## work log
 
-Number and name of feature: 1 Locations
 
-Estimate of time needed to complete: 45 min
+### Feature 1
 
-Start time:6.30p
+  Number and name of feature: 1 Locations
+  Estimate of time needed to complete: 45 min
+  Start time:6:30pm
+  Finish time: 8:00pm
+  Actual time needed to complete:2 hour 30 min
 
-Finish time: 8p
+### Feature 2
 
-Actual time needed to complete:2 hour 30 min
+  Number and name of feature: 2 weather
+  Estimate of time needed to complete: 1 hour 15 min
+  Start time:8:00pm
+  Finish time: 9:36pm
+  Actual time needed to complete:2 hour 30 min
 
-Number and name of feature: 2 weather
+### Feature 3
 
+Number and name of feature: Error catching
 Estimate of time needed to complete: 1 hour 15 min
-
-Start time:8p
-
-Finish time: 9.36p
-
-Actual time needed to complete:2 hour 30 min
+Start time:10:05am
+Finish time: 10:20am
+Actual time needed to complete:15 min
 
 ## Credits and Collaborations
