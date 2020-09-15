@@ -6,9 +6,7 @@ const express = require('express');
 const cors = require('cors');
 const { response, raw } = require('express');
 
-app.get('/bad', (request, response) => {
-  throw new Error('please put in a proper respnse');
-});
+
 
 const PORT = process.env.PORT;
 const app = express();
@@ -21,6 +19,9 @@ app.get('/', (request,response) => {
 app.get('/location', handleLocation);
 app.get('/weather', handleWeather);
 
+app.get('/bad', (request, response) => {
+  throw new Error('please put in a proper respnse');
+});
 
 function handleLocation(request, response) {
   try {
@@ -59,9 +60,6 @@ function Weather(day){
   this.forecast = day.weather.description;
   this.time = day.valid_date;
 }
-
-
-
 
 
 app.listen(PORT , () => console.log(`app is listening on : ${PORT}`));
