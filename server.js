@@ -62,7 +62,4 @@ function Weather(day){
 }
 
 
-
-
-
 app.listen(PORT , () => console.log(`app is listening on : ${PORT}`));
