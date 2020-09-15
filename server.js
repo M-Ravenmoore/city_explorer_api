@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const { response, raw } = require('express');
+const superagent = require('superagent');
 
 
 
@@ -17,6 +17,16 @@ app.get('/', (request,response) => {
 });
 
 app.get('/location', handleLocation);
+
+app.get('/location2',(req,res)=>{
+  let city = req.query.city;
+  let key = process.env;
+  let url = `the key url useing ${key} and ${city}`
+  superagent.get(url)
+    .then(data => console.log(data))
+    .then(data => res.send(data))
+    .catch(err => console.error(err));
+})
 app.get('/weather', handleWeather);
 
 
@@ -59,7 +69,7 @@ function Weather(day){
 }
 app.use ('*',notFoundHandler)
 function notFoundHandler(req,res) {
-  res.status(404).send('This isn not the page you are looking for! plese refresh and try again.')
+  res.status(404).send('This isn not the page you are looking for! plese refresh and try again. ')
 }
 
 app.listen(PORT , () => console.log(`app is listening on : ${PORT}`));
