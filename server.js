@@ -18,15 +18,15 @@ app.get('/', (request,response) => {
 
 app.get('/location', handleLocation);
 
-app.get('/location2',(req,res)=>{
-  let city = req.query.city;
-  let key = process.env;
-  let url = `the key url useing ${key} and ${city}`
-  superagent.get(url)
-    .then(data => console.log(data))
-    .then(data => res.send(data))
-    .catch(err => console.error(err));
-})
+// app.get('/location2',(req,res)=>{
+//   let city = req.query.city;
+//   let key = process.env.GEOKEY;
+//   let url = `the key url useing ${key} and ${city}`
+//   superagent.get(url)
+//     .then(data => console.log(data))
+//     .then(data => res.send(data))
+//     .catch(err => console.error(err));
+// })
 app.get('/weather', handleWeather);
 
 
@@ -45,10 +45,9 @@ function handleLocation(request, response) {
 function handleWeather(request, response) {
   try {
     const rawWeatherData = require('./data/weather.json');
-    const weatherArr = [];
-    rawWeatherData.data.forEach(day => {
-      weatherArr.push(new Weather(day))
-    })
+    const weatherArr = rawWeatherData.data.map(day => new Weather(day));
+    console.log(weatherArr)
+
     response.send(weatherArr);
   }catch(error){
     console.log('ERROR', error);
