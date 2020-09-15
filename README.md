@@ -42,8 +42,18 @@ Estimate of time needed to complete: 45 min
 
 Start time:6.30p
 
-Finish time:
+Finish time: 8p
 
-Actual time needed to complete:
+Actual time needed to complete:2 hour 30 min
+
+Number and name of feature: 2 weather
+
+Estimate of time needed to complete: 1 hour 15 min
+
+Start time:8p
+
+Finish time: 9.36p
+
+Actual time needed to complete:2 hour 30 min
 
 ## Credits and Collaborations
