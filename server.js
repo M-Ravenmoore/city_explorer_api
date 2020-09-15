@@ -19,9 +19,6 @@ app.get('/', (request,response) => {
 app.get('/location', handleLocation);
 app.get('/weather', handleWeather);
 
-app.get('/bad', (request, response) => {
-  throw new Error('please put in a proper respnse');
-});
 
 function handleLocation(request, response) {
   try {
@@ -60,6 +57,9 @@ function Weather(day){
   this.forecast = day.weather.description;
   this.time = day.valid_date;
 }
-
+app.use ('*',notFoundHandler)
+function notFoundHandler(req,res) {
+  res.status(404).send('This isn not the page you are looking for! plese refresh and try again.')
+}
 
 app.listen(PORT , () => console.log(`app is listening on : ${PORT}`));
