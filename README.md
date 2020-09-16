@@ -65,6 +65,30 @@ Start time:10:05am
 Finish time: 10:20am
 Actual time needed to complete:15 min
 
+### Feature 4
+
+Number and name of feature: .map(Reforating)
+Estimate of time needed to complete:45 min
+Start time:3:15pm
+Finish time: 3:45pm
+Actual time needed to complete:30min
+
+### Feature 5
+
+Number and name of feature: location API
+Estimate of time needed to complete: 1 hour 15 min
+Start time:4:05am
+Finish time: 7:35am
+Actual time needed to complete:3 hours 30 min
+
+### Feature 6
+
+Number and name of feature: Weather Api
+Estimate of time needed to complete: 1 hour
+Start time:8:30pm
+Finish time: 11:00pm
+Actual time needed to complete: 3 hours 30 min
+
 ## Credits and Collaborations
 
 
