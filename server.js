@@ -18,15 +18,27 @@ app.get('/', (request,response) => {
 
 app.get('/location', handleLocation);
 
-// app.get('/location2',(req,res)=>{
-//   let city = req.query.city;
-//   let key = process.env.GEOKEY;
-//   let url = `the key url useing ${key} and ${city}`
-//   superagent.get(url)
-//     .then(data => console.log(data))
-//     .then(data => res.send(data))
-//     .catch(err => console.error(err));
-// })
+app.get('/location2',(req,res)=>{
+  try{
+  let city = req.query.city;
+  let key = process.env.GEOCODE_API_KEY;
+  const url = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json&limit=1`;
+
+  superagent.get(url)
+    .then(data => {
+      const location = new Location(city,data.body[0])
+      console.log(data.body)
+      console.log(location)
+      res.json({locationData: location})
+    })
+    .catch(err => console.error(err))
+
+  }catch (error){
+    console.log('ERROR', error);
+    response.status(500).send('Join the dark side we have cookies and Errors please come back soon')
+  }
+});
+
 app.get('/weather', handleWeather);
 
 
@@ -55,11 +67,11 @@ function handleWeather(request, response) {
   }
 }
 
-function Location(cityInput,rawLocationData) {
-  this.search_query = cityInput;
-  this.formatted_query = rawLocationData[0].display_name;
-  this.latitude = rawLocationData[0].lat;
-  this.longitude = rawLocationData[0].lon;
+function Location(city,data) {
+  this.search_query = city;
+  this.formatted_query = data.display_name;
+  this.latitude = data.lat;
+  this.longitude = data.lon;
 }
 
 function Weather(day){
@@ -68,7 +80,7 @@ function Weather(day){
 }
 app.use ('*',notFoundHandler)
 function notFoundHandler(req,res) {
-  res.status(404).send('This isn not the page you are looking for! plese refresh and try again. ')
+  res.status(404).send('This isnt not the page you are looking for! plese refresh and try again. ')
 }
 
 app.listen(PORT , () => console.log(`app is listening on : ${PORT}`));
