@@ -16,6 +16,7 @@ app.get('/', (request,response) => {
 });
 app.get('/location',handleLocation)
 app.get('/weather', handleWeather);
+app.get('/trails',handleTrails);
 
 // catch all fails
 app.use ('*',notFoundHandler)
@@ -62,6 +63,26 @@ function handleWeather(req,res){
   }
 }
 
+function handleTrails(req,res){
+  try {
+    let lon = req.query.lon;
+    let lat = req.query.lat;
+    const key = process.env.TRAIL_API_KEY;
+    const url = `https://www.hikingproject.com/data/get-trails?lat=${lat}&lon=${lon}&maxDistance=10&key=${key}`;
+
+    superagent(url)
+    .then(trailsData => {
+
+      console.log(trailsData.body.trails[0])
+      const hike = trailsData.body.trails.map(trails => new TrailInfo(trails))
+      res.send(hike)
+    })
+  }catch(error){
+    console.log('ERROR', error);
+    response.status(500).send('Join the dark side we have cookies and Errors please come back soon')
+  }
+}
+
 function notFoundHandler(req,res) {
   res.status(404).send('This isnt not the page you are looking for! plese refresh and try again. ')
 }
@@ -79,17 +100,16 @@ function DailyWeather(day){
   let dateFormat = day.valid_date;
   this.time = new Date(dateFormat).toDateString()
 }
-// function Trail(trail){
-// this.name= Mt. Si",
-// this.location= ": "Tanner, Washington",
-// this.length =": "6.6",
-// this.stars =": "4.4",
-// this.star_votes =": "72",
-// this.summary =": "A steep, well-maintained trail takes you atop Mt. Si with outrageous views of Puget Sound.",
-// this.trail_url =": "https://www.hikingproject.com/trail/7001016/mt-si",
-// this.conditions =": "Dry",
-// this.condition_date =": "2018-07-22",
-// this.condition_time =": "0:17:22 "
-// }
+function TrailInfo(trail){
+this.name= trail.name;
+this.location= trail.location;
+this.length = trail.length;
+this.stars = trail.stars;
+this.star_votes = trail.starVotes
+this.summary = trail.summary;
+this.trail_url = trail.url
+this.conditions = trail.conditionStatus
+this.condition_date = trail.conditionDate
+}
 
 app.listen(PORT , () => console.log(`app is listening on : ${PORT}`));

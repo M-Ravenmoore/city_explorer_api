@@ -27,6 +27,7 @@ Currently using:
   * cors
 * JavaScript
 * heroku
+* superAgent
 
 ## Change Log
 
@@ -35,8 +36,11 @@ Currently using:
 09-14-2020 5:00pm PST  - Application now has a fully-functional express server, with heroku deployment and proof of life route.
 09-14-2020 8:00pm PST  - App can now pull data on locations from internal file
 09-14-2020 9:45pm PST  - App can now pull data on weather from internal file and parse it to usable needs
+
 09-15-2020 11:15am PST  - App Now has catch errors for 404 and 500 codes
 09-15-2020 3:45pm PST  - App can now pull data on weather from internal file via map method.
+09-15-2020 11:00 PST - App can now pull data from weather and display it from external api.
+
 
 ## work log
 
@@ -89,8 +93,17 @@ Start time:8:30pm
 Finish time: 11:00pm
 Actual time needed to complete: 3 hours 30 min
 
-## Credits and Collaborations
+### Feature 7
 
+Number and name of feature: trails Api
+Estimate of time needed to complete: 1 hour
+Start time:11:15pm
+Finish time: 11:50pm
+Actual time needed to complete: 35 min
+
+## Credits and Collaborations
 
 SERVER FIX FOR STUCK OPEN:
 sudo killall -9 node
+
+Colaborations Paul,Keith
