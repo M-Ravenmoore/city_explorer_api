@@ -14,10 +14,11 @@ app. use(cors());
 app.get('/', (request,response) => {
   response.send('I am a Dragon')
 });
-app.use ('*',notFoundHandler)
 app.get('/location',handleLocation)
 app.get('/weather', handleWeather);
 
+// catch all fails
+app.use ('*',notFoundHandler)
 
 // Handler Functions
 
