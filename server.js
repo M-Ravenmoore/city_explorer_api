@@ -29,7 +29,7 @@ app.get('/location2',(req,res)=>{
       const location = new Location(city,data.body[0])
       console.log(data.body)
       console.log(location)
-      res.json({locationData: location})
+      res.send(location)
     })
     .catch(err => console.error(err))
 
