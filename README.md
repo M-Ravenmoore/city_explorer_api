@@ -66,3 +66,7 @@ Finish time: 10:20am
 Actual time needed to complete:15 min
 
 ## Credits and Collaborations
+
+
+SERVER FIX FOR STUCK OPEN:
+sudo killall -9 node
