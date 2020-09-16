@@ -65,15 +65,15 @@ function handleWeather(req,res){
 
 function handleTrails(req,res){
   try {
-    let lon = req.query.lon;
-    let lat = req.query.lat;
+    let lon = req.query.longitude;
+    let lat = req.query.latitude;
     const key = process.env.TRAIL_API_KEY;
     const url = `https://www.hikingproject.com/data/get-trails?lat=${lat}&lon=${lon}&maxDistance=10&key=${key}`;
 
     superagent(url)
     .then(trailsData => {
 
-      console.log(trailsData.body.trails[0])
+      console.log(trailsData.body.trails)
       const hike = trailsData.body.trails.map(trails => new TrailInfo(trails))
       res.send(hike)
     })
