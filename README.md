@@ -44,7 +44,7 @@ Currently using:
 
 ## work log
 
-[See Feature log](../worklog.md)
+[See Feature log](worklog.md)
 
 ## Credits and Collaborations
 
