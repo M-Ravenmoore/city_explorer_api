@@ -3,20 +3,17 @@
 require('dotenv').config();
 
 const express = require('express');
+const app = express();
 const cors = require('cors');
 const superagent = require('superagent');
 const pg = require('pg')
 
-
-const app = express();
-const client = new pg.Client(process.env.DATABASE_URL);
 app. use(cors());
 
 const PORT = process.env.PORT;
 
-// holder for object pre creating db save(get it working then save it)
-let locations = {};
-
+const client = new pg.Client(process.env.DATABASE_URL);
+client.on('error', (err)=>{console.error(err);});
 
 // proof of life;
 app.get('/', (req,res) => res.status(200).send('I am a Dragon'));
@@ -25,8 +22,8 @@ app.get('/', (req,res) => res.status(200).send('I am a Dragon'));
 app.get('/location',handleLocation);
 app.get('/weather', handleWeather);
 app.get('/trails',handleTrails);
-app.get('/locations-db',handleGetLocation);
 
+// error catches
 
 app.use ('*',(req,res) =>{
   res.status(404).send('This is not the Place you are Looking for Try again: Route Not found');
@@ -40,59 +37,52 @@ app.use((err, req, res, next) => {
 // Handler Functions
 
 function handleLocation (req,res){
-  let city = req.query.city
-  const SQLlocation = `SELECT * FROM locations WHERE city_name=$1;`;
+  let city = req.query.city;
+  const SQLlocation = `SELECT * FROM locations WHERE search_query=$1;`;
   let safeValues = [city]
   client.query(SQLlocation,safeValues)
-  .then(results => {
-    if(results.rows.length > 0) {
-      console.log(`ahh yes ..${req.query.city} I have memory of such a place!`)
-      console.log('i have found your location:',results.rows[0])
-      res.status(200).json(results.rows[0]);
-    }else{
-      console.log(`uh...${req.query.city} I have NO memory of any such a place! lets check the Archives...`);
+    .then(results => {
+      if(results.rows.length > 0) {
+        console.log(`ahh yes ..${req.query.city} I have memory of such a place!`)
+        console.log('i have found your location:',results.rows[0])
+        res.status(200).json(results.rows[0]);
+      }else{
+        console.log(`uh...${req.query.city} I have NO memory of any such a place! lets check the Archives...`);
 
-      let url = `https://us1.locationiq.com/v1/search.php`;
-    
-      let queryObject = {
-        city: req.query.city,
-        key: process.env.GEOCODE_API_KEY,
-        format: 'json',
-        limit: 1
-    };
-    
-    superagent.get(url).query(queryObject)
-    .then(data => {
-      const location = new Location(req.query.city,data.body[0]);
-      console.log('i have found your location:',location);
+        let url = `https://us1.locationiq.com/v1/search.php`;
+        let queryObject = {
+          city: req.query.city,
+          key: process.env.GEOCODE_API_KEY,
+          format: 'json',
+          limit: 1
+        };
+        superagent.get(url).query(queryObject)
+          .then(data => {
+            const location = new Location(req.query.city,data.body[0]);
+            console.log('i have found your location:',location);
+            const SQL = `INSERT INTO locations (search_query,formatted_name, latitude, longitude) VALUES ($1, $2, $3, $4) returning *;`;
+            const safeValues = [location.search_query,location.formatted_query,location.latitude,location.longitude];
 
-      
-      const SQL = `INSERT INTO locations (city_name,formatted_name, latitude, longitude) VALUES ($1, $2, $3, $4) returning *;`;
-      
-      const safeValues = [location.search_query,location.formatted_query,location.latitude,location.longitude];
-      
-      // Run the query
-      console.log(safeValues)
-      client.query(SQL, safeValues)
-        .then(results => {
-          console.log('Sir i have saved your data',)
-        })
-        .catch(err => {throw new Error(err.message)});
-      res.status(200).send(location);
-    })
-    .catch(err => {
-      throw new Error(err.message);
-    })};
-  });
+            console.log(safeValues);
+            client.query(SQL, safeValues)
+              .then(results => {
+                console.log('Sir i have saved your data',results.rows);
+              }).catch(err => {throw new Error(err.message)});
+            res.status(200).send(location);
+          })
+          .catch(err => {
+            throw new Error(err.message);
+          })}
+    });
 }
 
 function handleWeather(req,res){
-    let lon = req.query.longitude;
-    let lat = req.query.latitude;
-    const key = process.env.WEATHER_API_KEY;
-    const url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${lat}&lon=${lon}&days=8&key=${key}`;
+  let lon = req.query.longitude;
+  let lat = req.query.latitude;
+  const key = process.env.WEATHER_API_KEY;
+  const url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${lat}&lon=${lon}&days=8&key=${key}`;
 
-    superagent(url)
+  superagent(url)
     .then(weatherData => {
       console.log(weatherData.body.data[0]);
       const day = weatherData.body.data.map(day => new DailyWeather(day));
@@ -105,12 +95,12 @@ function handleWeather(req,res){
 }
 
 function handleTrails(req,res){
-    let lon = req.query.longitude;
-    let lat = req.query.latitude;
-    const key = process.env.TRAIL_API_KEY;
-    const url = `https://www.hikingproject.com/data/get-trails?lat=${lat}&lon=${lon}&maxDistance=10&key=${key}`;
+  let lon = req.query.longitude;
+  let lat = req.query.latitude;
+  const key = process.env.TRAIL_API_KEY;
+  const url = `https://www.hikingproject.com/data/get-trails?lat=${lat}&lon=${lon}&maxDistance=10&key=${key}`;
 
-    superagent(url)
+  superagent(url)
     .then(trailsData => {
 
       console.log(trailsData.body.trails);
@@ -121,26 +111,6 @@ function handleTrails(req,res){
       console.error(err);
       throw new Error(err.message);
     });
-};
-
-function handleGetLocation(req,res){
-  const getLocation = "SELECT * FROM locations";
-
-  client.query(getLocation)
-    .then(results => {
-      if (results.rowCount >= 1) {
-        console.log('here is the data',results)
-        res.status(200).json(results)
-      }else {
-        res.status(500).send('NOTHING HERE MAN')
-      }
-    })
-    .catch(err => {throw new Error(err.message)})
-}
-
-// Helper Functions
-function startServer (){
-  app.listen(PORT , () => console.log(`app is listening on : ${PORT}`));
 }
 
 // constructor Functions
@@ -170,4 +140,7 @@ function TrailInfo(trail){
   this.condition_date = trail.conditionDate;
 }
 
-client.connect(startServer);
+client.connect()
+  .then(() => {
+    app.listen(PORT , () => console.log(`app is listening on : ${PORT}`));
+  });
