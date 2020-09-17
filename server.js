@@ -5,47 +5,88 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const superagent = require('superagent');
+const pg = require('pg')
 
 
-const PORT = process.env.PORT;
 const app = express();
+const client = new pg.Client(process.env.DATABASE_URL);
 app. use(cors());
 
-app.get('/', (request,response) => {
-  response.send('I am a Dragon')
-});
-app.get('/location',handleLocation)
+const PORT = process.env.PORT;
+
+// holder for object pre creating db save(get it working then save it)
+let locations = {};
+
+
+// proof of life;
+app.get('/', (req,res) => res.status(200).send('I am a Dragon'));
+
+// Routes
+app.get('/location',handleLocation);
 app.get('/weather', handleWeather);
 app.get('/trails',handleTrails);
+app.get('/locations-db',handleGetLocation);
 
-// catch all fails
-app.use ('*',notFoundHandler)
+
+app.use ('*',(req,res) =>{
+  res.status(404).send('This is not the Place you are Looking for Try again: Route Not found');
+});
+
+app.use((err, req, res, next) => {
+  res.status(500).send(`Welcome to the DarkSide we have Cupcakes and a Server Error: ${err.message} : ${err.txt}`);
+});
+
 
 // Handler Functions
 
 function handleLocation (req,res){
-  try{
-    let city = req.query.city;
-    let key = process.env.GEOCODE_API_KEY;
-    const url = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json&limit=1`;
+  let city = req.query.city
+  const SQLlocation = `SELECT * FROM locations WHERE city_name=$1;`;
+  let safeValues = [city]
+  client.query(SQLlocation,safeValues)
+  .then(results => {
+    if(results.rows.length > 0) {
+      console.log(`ahh yes ..${req.query.city} I have memory of such a place!`)
+      console.log('i have found your location:',results.rows[0])
+      res.status(200).json(results.rows[0]);
+    }else{
+      console.log(`uh...${req.query.city} I have NO memory of any such a place! lets check the Archives...`);
+
+      let url = `https://us1.locationiq.com/v1/search.php`;
     
-    superagent.get(url)
+      let queryObject = {
+        city: req.query.city,
+        key: process.env.GEOCODE_API_KEY,
+        format: 'json',
+        limit: 1
+    };
+    
+    superagent.get(url).query(queryObject)
     .then(data => {
-      const location = new Location(city,data.body[0])
-      console.log(data.body[0])
-      console.log(location)
-      res.send(location)
+      const location = new Location(req.query.city,data.body[0]);
+      console.log('i have found your location:',location);
+
+      
+      const SQL = `INSERT INTO locations (city_name,formatted_name, latitude, longitude) VALUES ($1, $2, $3, $4) returning *;`;
+      
+      const safeValues = [location.search_query,location.formatted_query,location.latitude,location.longitude];
+      
+      // Run the query
+      console.log(safeValues)
+      client.query(SQL, safeValues)
+        .then(results => {
+          console.log('Sir i have saved your data',)
+        })
+        .catch(err => {throw new Error(err.message)});
+      res.status(200).send(location);
     })
-    .catch(err => console.error(err))
-    
-  }catch (error){
-    console.log('ERROR', error);
-    response.status(500).send('Join the dark side we have cookies and Errors please come back soon')
-  }
-};
+    .catch(err => {
+      throw new Error(err.message);
+    })};
+  });
+}
 
 function handleWeather(req,res){
-  try {
     let lon = req.query.longitude;
     let lat = req.query.latitude;
     const key = process.env.WEATHER_API_KEY;
@@ -53,18 +94,17 @@ function handleWeather(req,res){
 
     superagent(url)
     .then(weatherData => {
-      console.log(weatherData.body.data[0])
-      const day = weatherData.body.data.map(day => new DailyWeather(day))
-      res.send(day)
+      console.log(weatherData.body.data[0]);
+      const day = weatherData.body.data.map(day => new DailyWeather(day));
+      res.status(200).send(day);
     })
-  }catch(error){
-    console.log('ERROR', error);
-    response.status(500).send('Join the dark side we have cookies and Errors please come back soon')
-  }
+    .catch(err => {
+      console.error(err);
+      throw new Error(err.message);
+    });
 }
 
 function handleTrails(req,res){
-  try {
     let lon = req.query.longitude;
     let lat = req.query.latitude;
     const key = process.env.TRAIL_API_KEY;
@@ -73,20 +113,37 @@ function handleTrails(req,res){
     superagent(url)
     .then(trailsData => {
 
-      console.log(trailsData.body.trails)
-      const hike = trailsData.body.trails.map(trails => new TrailInfo(trails))
-      res.send(hike)
+      console.log(trailsData.body.trails);
+      const hike = trailsData.body.trails.map(trails => new TrailInfo(trails));
+      res.status(200).send(hike);
     })
-  }catch(error){
-    console.log('ERROR', error);
-    response.status(500).send('Join the dark side we have cookies and Errors please come back soon')
-  }
+    .catch(err => {
+      console.error(err);
+      throw new Error(err.message);
+    });
+};
+
+function handleGetLocation(req,res){
+  const getLocation = "SELECT * FROM locations";
+
+  client.query(getLocation)
+    .then(results => {
+      if (results.rowCount >= 1) {
+        console.log('here is the data',results)
+        res.status(200).json(results)
+      }else {
+        res.status(500).send('NOTHING HERE MAN')
+      }
+    })
+    .catch(err => {throw new Error(err.message)})
 }
 
-function notFoundHandler(req,res) {
-  res.status(404).send('This isnt not the page you are looking for! plese refresh and try again. ')
+// Helper Functions
+function startServer (){
+  app.listen(PORT , () => console.log(`app is listening on : ${PORT}`));
 }
-// HelperFunctions
+
+// constructor Functions
 
 function Location(city,data) {
   this.search_query = city;
@@ -98,18 +155,19 @@ function Location(city,data) {
 function DailyWeather(day){
   this.forecast = day.weather.description;
   let dateFormat = day.valid_date;
-  this.time = new Date(dateFormat).toDateString()
-}
-function TrailInfo(trail){
-this.name= trail.name;
-this.location= trail.location;
-this.length = trail.length;
-this.stars = trail.stars;
-this.star_votes = trail.starVotes
-this.summary = trail.summary;
-this.trail_url = trail.url
-this.conditions = trail.conditionStatus
-this.condition_date = trail.conditionDate
+  this.time = new Date(dateFormat).toDateString();
 }
 
-app.listen(PORT , () => console.log(`app is listening on : ${PORT}`));
+function TrailInfo(trail){
+  this.name = trail.name;
+  this.location = trail.location;
+  this.length = trail.length;
+  this.stars = trail.stars;
+  this.star_votes = trail.starVotes;
+  this.summary = trail.summary;
+  this.trail_url = trail.url;
+  this.conditions = trail.conditionStatus;
+  this.condition_date = trail.conditionDate;
+}
+
+client.connect(startServer);
