@@ -78,10 +78,18 @@
 * Finish time: 4:38pm
 * Actual time needed to complete: 0 hours 23 min
 
-### Feature 09
+### Feature 09a
 
-* Name of feature: Server
+* Name of feature: Server operations for location
 * Estimate of time needed to complete: 2 hours 25 min
+* Start time: 6:15 pm
+* Finish time: 11:30pm
+* Actual time needed to complete: 5 hours 15 min
+
+### Feature 09a
+
+* Name of feature: Server operations for other api
+* Estimate of time needed to complete: 2 hours 15 min
 * Start time: -:-- pm
 * Finish time: -:--pm
 * Actual time needed to complete: - hours -- min

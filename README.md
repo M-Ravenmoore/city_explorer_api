@@ -39,7 +39,8 @@ Currently using:
 09-14-2020 9:45pm PST - App can now pull data on weather from internal file and parse it to usable needs.
 09-15-2020 11:15am PST - App Now has catch errors for 404 and 500 codes
 09-15-2020 3:45pm PST - App can now pull data on weather from internal file via map method.
-09-15-2020 11:00 PST - App can now pull data from weather and display it from external api.
+09-15-2020 11:00pm PST - App can now pull data from weather and display it from external api.
+09-15-2020 6:60pm PST - App now has an acciciated database.
 
 ## work log
 
