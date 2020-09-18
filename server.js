@@ -108,9 +108,8 @@ function handleWeather(req,res){
 
         superagent.get(url).query(queryObject)
           .then(weatherData => {
-            console.log(`sir the weather this week will be:`, weatherData.body.data[0]);
             const day = weatherData.body.data.map(day => new DailyWeather(day));
-            console.log(`i have found your local weather:`,day[0])
+            console.log(`i have found your local weather and sir the weather this week will be:`,day[0])
 
             day.forEach(forecastDay =>{
               const SQLweatherAdd = `INSERT INTO weather (time,forecast,lon,lat) VALUES ($1,$2,$3,$4);`;
