@@ -51,7 +51,7 @@ function handleLocation (req,res){
 
         let url = `https://us1.locationiq.com/v1/search.php`;
         let queryObject = {
-          city: req.query.city,
+          city,
           key: process.env.GEOCODE_API_KEY,
           format: 'json',
           limit: 1
@@ -66,32 +66,67 @@ function handleLocation (req,res){
             console.log(safeValues);
             client.query(SQL, safeValues)
               .then(results => {
-                console.log('Sir i have saved your data',results.rows);
+                console.log('Sir i have saved your data',results.rows[0]);
               }).catch(err => {throw new Error(err.message)});
             res.status(200).send(location);
           })
-          .catch(err => {
-            throw new Error(err.message);
-          })}
+          .catch(err => {throw new Error(err.message);})}
     });
 }
 
 function handleWeather(req,res){
   let lon = req.query.longitude;
   let lat = req.query.latitude;
-  const key = process.env.WEATHER_API_KEY;
-  const url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${lat}&lon=${lon}&days=8&key=${key}`;
+  const today = new Date().toDateString()
 
-  superagent(url)
-    .then(weatherData => {
-      console.log(weatherData.body.data[0]);
-      const day = weatherData.body.data.map(day => new DailyWeather(day));
-      res.status(200).send(day);
+  const SQLweather = `SELECT * FROM weather WHERE weather.lat=$1 AND weather.lon=$2;`;
+  const safeValues = [lat,lon]
+  console.log(today)
+
+  client.query(SQLweather,safeValues)
+    .then(results => {
+      console.log(results.rows)
+      if(results.rows.length > 0) {
+        console.log(`there is data here lets see...`,results.rows)
+        if(results.rows[0].time === today){
+          console.log(`Hello sir the weather is:`,results.rows);
+          res.status(200).send(results.rows);
+        }
+      }else{
+        const SQLremoveLoc = `DELETE FROM weather WHERE weather.lat=$1 AND weather.lon=$2;`;
+        const safeName = [lat,lon]
+        client.query(SQLremoveLoc,safeName)
+        console.log(`let me go get some new weather information one moment sir...`)
+
+        const url = `https://api.weatherbit.io/v2.0/forecast/daily`;
+        let queryObject = {
+          lat,
+          lon,
+          key: process.env.WEATHER_API_KEY,
+          days: 8
+        }
+
+        superagent.get(url).query(queryObject)
+          .then(weatherData => {
+            console.log(`sir the weather this week will be:`, weatherData.body.data[0]);
+            const day = weatherData.body.data.map(day => new DailyWeather(day));
+            console.log(`i have found your local weather:`,day[0])
+
+            day.forEach(forecastDay =>{
+              const SQLweatherAdd = `INSERT INTO weather (time,forecast,lon,lat) VALUES ($1,$2,$3,$4);`;
+              let safeValues = [forecastDay.time,forecastDay.forecast,lon,lat];
+              console.log(safeValues);
+              client.query(SQLweatherAdd,safeValues)
+                .then(results => {
+                }).catch(err => {throw new Error(err.message)});
+            })
+            console.log(`Sir the weather for this week is saved`,day);
+            res.status(200).send(day);
+          })
+          .catch(err => {throw new Error(err.message);
+          });
+      }
     })
-    .catch(err => {
-      console.error(err);
-      throw new Error(err.message);
-    });
 }
 
 function handleTrails(req,res){
@@ -112,6 +147,7 @@ function handleTrails(req,res){
       throw new Error(err.message);
     });
 }
+
 
 // constructor Functions
 
