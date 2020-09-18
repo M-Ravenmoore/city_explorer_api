@@ -60,7 +60,7 @@ function handleLocation (req,res){
           .then(data => {
             const location = new Location(req.query.city,data.body[0]);
             console.log('i have found your location:',location);
-            const SQL = `INSERT INTO locations (search_query,formatted_name, latitude, longitude) VALUES ($1, $2, $3, $4) returning *;`;
+            const SQL = `INSERT INTO locations (search_query,formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4) returning *;`;
             const safeValues = [location.search_query,location.formatted_query,location.latitude,location.longitude];
 
             console.log(safeValues);
