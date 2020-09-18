@@ -89,8 +89,9 @@ function handleWeather(req,res){
       if(results.rows.length > 0) {
         console.log(`there is data here lets see...`,results.rows)
         if(results.rows[0].time === today){
-          console.log(`Hello sir the weather is:`,results.rows);
-          res.status(200).send(results.rows);
+          const storedWeather = results.rows.map(day => new StoredDays(day));
+          console.log(`Hello sir the weather is:`,storedWeather);
+          res.status(200).send(storedWeather);
         }
       }else{
         const SQLremoveLoc = `DELETE FROM weather WHERE weather.lat=$1 AND weather.lon=$2;`;
@@ -156,7 +157,10 @@ function Location(city,data) {
   this.latitude = data.lat;
   this.longitude = data.lon;
 }
-
+function StoredDays(day){
+  this.forecast = day.forecast
+  this.time = day.time
+}
 function DailyWeather(day){
   this.forecast = day.weather.description;
   let dateFormat = day.valid_date;
@@ -179,3 +183,6 @@ client.connect()
   .then(() => {
     app.listen(PORT , () => console.log(`app is listening on : ${PORT}`));
   });
+
+
+  
