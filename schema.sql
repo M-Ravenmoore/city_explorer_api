@@ -1,19 +1,16 @@
 DROP TABLE IF EXISTS locations;
 CREATE TABLE locations (
   id SERIAL PRIMARY KEY,
-  city_name VARCHAR(50),
+  search_query VARCHAR(50),
   formatted_name VARCHAR(200),
   latitude decimal,
   longitude decimal
 );
-
-INSERT INTO locations (
-  city_name,
-  latitude,
-  longitude
-)
-VALUES (
-  'seattle',
-  42,
-  -123
+DROP TABLE IF EXISTS weather;
+CREATE TABLE weather (
+  id SERIAL PRIMARY KEY,
+  time VARCHAR(30),
+  forecast VARCHAR(225),
+  lat decimal,
+  lon decimal
 );

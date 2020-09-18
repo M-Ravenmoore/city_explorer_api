@@ -41,6 +41,7 @@ Currently using:
 09-15-2020 3:45pm PST - App can now pull data on weather from internal file via map method.
 09-15-2020 11:00pm PST - App can now pull data from weather and display it from external api.
 09-15-2020 6:60pm PST - App now has an acciciated database.
+09-15-2020 11:50pm PST - App can now store location data and check aginst it on query.
 
 ## work log
 
@@ -49,6 +50,7 @@ Currently using:
 ## Credits and Collaborations
 
 SERVER FIX FOR STUCK OPEN:
-sudo killall -9 node
+sudo killall -9 node credit ta Kait.
 
-Colaborations Paul,Keith
+Colaborations Paul,Keith,
+Colab on getting DB working Czarl,

@@ -80,7 +80,7 @@
 
 ### Feature 09a
 
-* Name of feature: Server operations for location
+* Name of feature: Database operations for location
 * Estimate of time needed to complete: 2 hours 25 min
 * Start time: 6:15 pm
 * Finish time: 11:30pm
@@ -88,16 +88,24 @@
 
 ### Feature 09b
 
-* Name of feature: Server operations for other api
+* Name of feature: Database operations for weather
 * Estimate of time needed to complete: 2 hours 15 min
-* Start time: -:-- pm
-* Finish time: -:--pm
+* Start time: 4:33 pm
+* Finish time: 8:45pm
 * Actual time needed to complete: - hours -- min
 
 ### Feature 10
 
-* Name of feature: Deploy DB
+* Name of feature: DB opperations for trails (streach)
 * Estimate of time needed to complete: 1 hours 25 min
+* Start time: -:-- pm
+* Finish time: -:--pm
+* Actual time needed to complete: - hours -- min
+
+### Feature 11
+
+* Name of feature: add movies api and dbing for it (streach)
+* Estimate of time needed to complete: 2 hours 25 min
 * Start time: -:-- pm
 * Finish time: -:--pm
 * Actual time needed to complete: - hours -- min
