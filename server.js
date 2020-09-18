@@ -85,9 +85,9 @@ function handleWeather(req,res){
 
   client.query(SQLweather,safeValues)
     .then(results => {
-      console.log(results.rows)
+      // console.log(results.rows)
       if(results.rows.length > 0) {
-        console.log(`there is data here lets see...`,results.rows)
+        console.log(`there is data here lets see...`)
         if(results.rows[0].time === today){
           const storedWeather = results.rows.map(day => new StoredDays(day));
           console.log(`Hello sir the weather is:`,storedWeather);
