@@ -77,7 +77,10 @@ function handleLocation (req,res){
 function handleWeather(req,res){
   let lon = req.query.longitude;
   let lat = req.query.latitude;
-  const today = new Date().toDateString()
+  const today = new Date();
+  // setting day clock to midnight
+  today.setHours(0,0,0,0);
+
 
   const SQLweather = `SELECT * FROM weather WHERE weather.lat=$1 AND weather.lon=$2;`;
   const safeValues = [lat,lon]
@@ -87,45 +90,45 @@ function handleWeather(req,res){
     .then(results => {
       // console.log(results.rows)
       if(results.rows.length > 0) {
-        console.log(`there is data here lets see...`)
-        if(results.rows[0].time === today){
+        console.log(`there is data here lets see...`,today,results.rows[0].time)
+
+        // compare saved date to todays converted date
+        if(Date.parse(results.rows[0].time.substring(4)) >= today){
           const storedWeather = results.rows.map(day => new StoredDays(day));
           console.log(`Hello sir the weather is:`,storedWeather);
           res.status(200).send(storedWeather);
         }
-      }else{
-        const SQLremoveLoc = `DELETE FROM weather WHERE weather.lat=$1 AND weather.lon=$2;`;
-        const safeName = [lat,lon]
-        client.query(SQLremoveLoc,safeName)
-        console.log(`let me go get some new weather information one moment sir...`)
-
-        const url = `https://api.weatherbit.io/v2.0/forecast/daily`;
-        let queryObject = {
-          lat,
-          lon,
-          key: process.env.WEATHER_API_KEY,
-          days: 8
-        }
-
-        superagent.get(url).query(queryObject)
-          .then(weatherData => {
-            const day = weatherData.body.data.map(day => new DailyWeather(day));
-            console.log(`i have found your local weather and sir the weather this week will be:`,day[0])
-
-            day.forEach(forecastDay =>{
-              const SQLweatherAdd = `INSERT INTO weather (time,forecast,lon,lat) VALUES ($1,$2,$3,$4);`;
-              let safeValues = [forecastDay.time,forecastDay.forecast,lon,lat];
-              console.log(safeValues);
-              client.query(SQLweatherAdd,safeValues)
-                .then(results => {
-                }).catch(err => {throw new Error(err.message)});
-            })
-            console.log(`Sir the weather for this week is saved`,day);
-            res.status(200).send(day);
-          })
-          .catch(err => {throw new Error(err.message);
-          });
       }
+      const SQLremoveLoc = `DELETE FROM weather WHERE weather.lat=$1 AND weather.lon=$2;`;
+      const safeName = [lat,lon]
+      client.query(SQLremoveLoc,safeName)
+      console.log(`let me go get some new weather information one moment sir...`)
+
+      const url = `https://api.weatherbit.io/v2.0/forecast/daily`;
+      let queryObject = {
+        lat,
+        lon,
+        key: process.env.WEATHER_API_KEY,
+        days: 8
+      }
+
+      superagent.get(url).query(queryObject)
+        .then(weatherData => {
+          const day = weatherData.body.data.map(day => new DailyWeather(day));
+          console.log(`i have found your local weather and sir the weather this week will be:`,day[0])
+
+          day.forEach(forecastDay =>{
+            const SQLweatherAdd = `INSERT INTO weather (time,forecast,lon,lat) VALUES ($1,$2,$3,$4);`;
+            let safeValues = [forecastDay.time,forecastDay.forecast,lon,lat];
+            console.log(safeValues);
+            client.query(SQLweatherAdd,safeValues)
+              .catch(err => {throw new Error(err.message)});
+          })
+          console.log(`Sir the weather for this week is saved`,day);
+          res.status(200).send(day);
+        })
+        .catch(err => {throw new Error(err.message);
+        });
     })
 }
 
@@ -183,6 +186,3 @@ client.connect()
   .then(() => {
     app.listen(PORT , () => console.log(`app is listening on : ${PORT}`));
   });
-
-
-  
